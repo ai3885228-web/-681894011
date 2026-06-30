@@ -1,76 +1,76 @@
 // ==========================================
-// DATABASE CONTROLLER (SUPABASE & LOCAL STORAGE)
+// DATABASE CONTROLLER (SUPABASE & LOCAL STORAGE) - THAI EDITION
 // ==========================================
 
 const MOCK_MENU = [
     {
         id: "m1",
-        name: "Spaghetti Carbonara",
+        name: "สปาเก็ตตี้คาโบนาร่า",
         price: 189.00,
-        description: "Classic Italian pasta with creamy egg sauce, parmesan cheese, and crispy bacon.",
+        description: "เส้นสปาเก็ตตี้เหนียวนุ่ม ผัดซอสครีมข้มข้นสูตรอิตาเลียนแท้ โรยพาเมซานชีสและเบคอนกรอบหอมกรุ่น",
         category: "main",
         image_url: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=600&auto=format&fit=crop&q=80",
         available: true
     },
     {
         id: "m2",
-        name: "Wagyu Beef Burger",
+        name: "เบอร์เกอร์เนื้อวากิวพรีเมียม",
         price: 259.00,
-        description: "Premium Wagyu beef patty, cheddar cheese, caramelized onions, and signature burger sauce on brioche bun.",
+        description: "เนื้อวากิวบดชิ้นโตย่างชุ่มฉ่ำ ประกบเชดดาร์ชีสเยิ้ม หอมใหญ่ผัดหวาน และซอสโฮมเมดสูตรพิเศษบนขนมปังบริออช",
         category: "main",
         image_url: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80",
         available: true
     },
     {
         id: "m3",
-        name: "Caesar Salad with Grilled Chicken",
+        name: "ซีซาร์สลัดอกไก่ย่าง",
         price: 159.00,
-        description: "Fresh romaine lettuce tossed with Caesar dressing, croutons, parmesan cheese, and tender grilled chicken.",
+        description: "ผักสลัดคอสกรอบสด คลุกเคล้าน้ำสลัดซีซาร์สูตรดั้งเดิม โรยเบคอนกรอบ ขนมปังกรอบ และอกไก่ย่างเนื้อนุ่ม",
         category: "appetizer",
         image_url: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=600&auto=format&fit=crop&q=80",
         available: true
     },
     {
         id: "m4",
-        name: "Truffle French Fries",
+        name: "เฟรนช์ฟรายส์ซอสทรัฟเฟิล",
         price: 129.00,
-        description: "Golden crispy french fries tossed with white truffle oil, sea salt, and grated parmesan cheese.",
+        description: "มันฝรั่งทอดชิ้นหนาสีเหลืองทองกรอบนอกนุ่มใน คลุกเคล้าน้ำมันเห็ดทรัฟเฟิลและพาร์เมซานชีสขูดสด",
         category: "appetizer",
         image_url: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80",
         available: true
     },
     {
         id: "m5",
-        name: "New York Cheesecake",
+        name: "นิวยอร์กชีสเค้กคลาสสิก",
         price: 119.00,
-        description: "Rich and creamy classic baked cheesecake with a sweet graham cracker crust and raspberry coulis.",
+        description: "ชีสเค้กเนื้อครีมเนียนนุ่ม หอมมัน เข้มข้น บนฐานบิสกิตอบเนยกรุบกรอบ เสิร์ฟพร้อมซอสสตรอว์เบอร์รี่รสเปรี้ยวหวาน",
         category: "dessert",
         image_url: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=600&auto=format&fit=crop&q=80",
         available: true
     },
     {
         id: "m6",
-        name: "Chocolate Lava Cake",
+        name: "ช็อกโกแลตลาวาเค้ก",
         price: 139.00,
-        description: "Warm chocolate cake with a molten chocolate center, served with vanilla bean ice cream.",
+        description: "เค้กช็อกโกแลตอุ่นร้อน สอดไส้ซอสช็อกโกแลตเบลเยียมเข้มข้นเยิ้มๆ เสิร์ฟพร้อมไอศกรีมวานิลลาเม็ดแท้",
         category: "dessert",
         image_url: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&auto=format&fit=crop&q=80",
         available: true
     },
     {
         id: "m7",
-        name: "Iced Matcha Latte",
+        name: "มัทฉะลาเต้เย็นสูตรพิเศษ",
         price: 85.00,
-        description: "Premium Japanese Uji matcha whisked with fresh milk and sweetened with organic honey.",
+        description: "ผงมัทฉะแท้เกรดพิธีการนำเข้าจากญี่ปุ่น ชงเข้มข้นผสมนมสดแท้ เพิ่มความหวานละมุนด้วยน้ำผึ้งป่าแท้",
         category: "drink",
         image_url: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=600&auto=format&fit=crop&q=80",
         available: true
     },
     {
         id: "m8",
-        name: "Fresh Thai Coconut Water",
+        name: "น้ำมะพร้าวน้ำหอมสดแท้",
         price: 75.00,
-        description: "Chilled young organic coconut served whole, naturally sweet and refreshing.",
+        description: "น้ำมะพร้าวออร์แกนิกคัดเกรดเสิร์ฟแช่เย็นเจาะสดๆ รสชาติหวานหอมกลมกล่อมจากธรรมชาติ ดับร้อนได้ดีเยี่ยม",
         category: "drink",
         image_url: "https://images.unsplash.com/photo-1525385133336-254847240f92?w=600&auto=format&fit=crop&q=80",
         available: true
@@ -118,17 +118,17 @@ class RestaurantDB {
         }
         if (!localStorage.getItem('rest_staff')) {
             localStorage.setItem('rest_staff', JSON.stringify([
-                { id: "s1", username: "admin", password: "password123", name: "Manager Admin", role: "admin" }
+                { id: "s1", username: "admin", password: "password123", name: "ผู้จัดการ แอดมิน", role: "admin" }
             ]));
         }
         if (!localStorage.getItem('rest_settings')) {
             localStorage.setItem('rest_settings', JSON.stringify({
-                restaurantName: "The Tasty Plate",
-                address: "123 Food Street, Bangkok, Thailand",
+                restaurantName: "เดอะ เทสตี้ เพลท (The Tasty Plate)",
+                address: "123 ถนนอาหารอร่อย แขวงดินแดง เขตดินแดง กรุงเทพฯ 10400",
                 phone: "02-123-4567",
                 taxRate: 7.0, // 7%
                 serviceChargeRate: 10.0, // 10%
-                receiptFooter: "Thank you for dining with us!"
+                receiptFooter: "ขอบคุณที่มาใช้บริการ! ขอให้เป็นวันแสนวิเศษของคุณ"
             }));
         }
     }
@@ -166,7 +166,6 @@ class RestaurantDB {
             
             if (error) {
                 console.error("Supabase Error getting menu items:", error);
-                // Graceful fallback to LocalStorage if query fails (e.g. database schema not created yet)
                 return JSON.parse(localStorage.getItem('rest_menu') || '[]');
             }
             return data;
@@ -277,8 +276,8 @@ class RestaurantDB {
 
         const orderData = {
             order_number: orderNumber,
-            customer_name: order.customer_name || "Guest",
-            table_number: order.table_number || "Takeaway",
+            customer_name: order.customer_name || "ลูกค้าทั่วไป",
+            table_number: order.table_number || "หิ้วกลับบ้าน",
             items: order.items,
             subtotal: subtotal,
             tax: tax,
@@ -342,7 +341,6 @@ class RestaurantDB {
             
             if (error) {
                 console.error("Supabase login error:", error);
-                // Fallback authentication locally for easy testing
                 return this.localLoginStaff(username, password);
             }
             if (data && data.length > 0) {
@@ -380,14 +378,13 @@ class RestaurantDB {
     // ==========================================
 
     async getSettings() {
-        // Settings are stored in LocalStorage for configuration convenience
         return JSON.parse(localStorage.getItem('rest_settings')) || {
-            restaurantName: "The Tasty Plate",
-            address: "123 Food Street, Bangkok, Thailand",
+            restaurantName: "เดอะ เทสตี้ เพลท (The Tasty Plate)",
+            address: "123 ถนนอาหารอร่อย แขวงดินแดง เขตดินแดง กรุงเทพฯ 10400",
             phone: "02-123-4567",
             taxRate: 7.0,
             serviceChargeRate: 10.0,
-            receiptFooter: "Thank you for dining with us!"
+            receiptFooter: "ขอบคุณที่มาใช้บริการ! ขอให้เป็นวันแสนวิเศษของคุณ"
         };
     }
 

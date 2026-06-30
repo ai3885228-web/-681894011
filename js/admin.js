@@ -1,5 +1,5 @@
 // ==========================================
-// BACKOFFICE AND POS RECEIPT LOGIC
+// BACKOFFICE AND POS RECEIPT LOGIC - THAI EDITION
 // ==========================================
 
 let adminOrders = [];
@@ -7,18 +7,32 @@ let adminMenuItems = [];
 let revenueChart = null;
 let categoryChart = null;
 
+const STATUS_TRANSLATIONS = {
+    'pending': 'รอยืนยัน',
+    'preparing': 'กำลังปรุง',
+    'completed': 'เสร็จสิ้น',
+    'cancelled': 'ยกเลิกแล้ว'
+};
+
+const CATEGORY_TRANSLATIONS = {
+    'appetizer': 'ของทานเล่น',
+    'main': 'อาหารจานหลัก',
+    'dessert': 'ของหวาน',
+    'drink': 'เครื่องดื่ม'
+};
+
 // Auth check when entering admin view
 async function initAdminPortal() {
     const user = db.getCurrentUser();
     if (!user) {
-        alert("Access Denied: Please log in.");
+        alert("กรุณาเข้าสู่ระบบก่อนเข้าใช้งาน");
         navigateTo('login-view');
         return;
     }
     
     // Set Staff metadata
     document.getElementById("staff-name").innerText = user.name;
-    document.getElementById("staff-role").innerText = user.role.toUpperCase();
+    document.getElementById("staff-role").innerText = user.role === 'admin' ? 'ผู้จัดการร้าน' : 'พนักงาน';
     
     // Load and render default dashboard data
     switchAdminPanel('dashboard');
@@ -133,7 +147,7 @@ async function refreshDashboardData() {
         for (const [cat, count] of Object.entries(categoryCounts)) {
             if (count > maxCount) {
                 maxCount = count;
-                popularCat = cat.charAt(0).toUpperCase() + cat.slice(1);
+                popularCat = CATEGORY_TRANSLATIONS[cat] || cat;
             }
         }
         
@@ -167,9 +181,9 @@ function setupRevenueChart(salesByDay) {
     revenueChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels.length > 0 ? labels : ["No Sales"],
+            labels: labels.length > 0 ? labels : ["ไม่มีข้อมูลการขาย"],
             datasets: [{
-                label: 'Sales Revenue (฿)',
+                label: 'รายได้จากการขาย (฿)',
                 data: data.length > 0 ? data : [0],
                 borderColor: '#E2725B',
                 backgroundColor: 'rgba(226, 114, 91, 0.1)',
@@ -205,7 +219,7 @@ function setupCategoryChart(categoryCounts) {
     categoryChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: categories.length > 0 ? categories.map(c => c.toUpperCase()) : ["No Sales"],
+            labels: categories.length > 0 ? categories.map(c => (CATEGORY_TRANSLATIONS[c] || c).toUpperCase()) : ["ไม่มีข้อมูลการขาย"],
             datasets: [{
                 data: data.length > 0 ? data : [1],
                 backgroundColor: ['#E2725B', '#84A98C', '#E09F3E', '#A8A29E'],
@@ -240,7 +254,7 @@ async function refreshOrdersQueue() {
         if (activeOrders.length === 0) {
             container.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: white; border-radius: var(--radius-md); border: 1px solid var(--border); color: var(--text-secondary);">
-                    No active orders in queue. Relax! 🍹
+                    ไม่มีรายการอาหารค้างในคิวระบบขณะนี้ 🍹
                 </div>
             `;
             return;
@@ -267,9 +281,9 @@ async function refreshOrdersQueue() {
             // Generate contextual primary action button
             let actionBtn = "";
             if (order.status === 'pending') {
-                actionBtn = `<button class="btn-action primary" onclick="updateOrderStatus('${order.id}', 'preparing')">Accept Order</button>`;
+                actionBtn = `<button class="btn-action primary" onclick="updateOrderStatus('${order.id}', 'preparing')">ยืนยันรับออเดอร์</button>`;
             } else if (order.status === 'preparing') {
-                actionBtn = `<button class="btn-action primary" onclick="updateOrderStatus('${order.id}', 'completed')">Complete & Print</button>`;
+                actionBtn = `<button class="btn-action primary" onclick="updateOrderStatus('${order.id}', 'completed')">เสร็จสิ้น & พิมพ์ใบเสร็จ</button>`;
             }
 
             card.innerHTML = `
@@ -278,7 +292,7 @@ async function refreshOrdersQueue() {
                         <h3>${order.order_number}</h3>
                         <div class="order-time">${dateStr} ${timeStr}</div>
                     </div>
-                    <span class="status-badge ${order.status}">${order.status.toUpperCase()}</span>
+                    <span class="status-badge ${order.status}">${STATUS_TRANSLATIONS[order.status] || order.status}</span>
                 </div>
                 <div class="order-card-body">
                     <div class="order-customer">
@@ -289,10 +303,10 @@ async function refreshOrdersQueue() {
                     </div>
                 </div>
                 <div class="order-card-footer">
-                    <span class="order-total">Total: ฿${parseFloat(order.total).toFixed(2)}</span>
+                    <span class="order-total">ยอดรวม: ฿${parseFloat(order.total).toFixed(2)}</span>
                     <div class="order-actions-btn-group">
                         ${actionBtn}
-                        <button class="btn-action secondary" onclick="cancelOrder('${order.id}')">Cancel</button>
+                        <button class="btn-action secondary" onclick="cancelOrder('${order.id}')">ยกเลิกออเดอร์</button>
                     </div>
                 </div>
             `;
@@ -314,12 +328,12 @@ async function updateOrderStatus(orderId, nextStatus) {
         
         refreshOrdersQueue();
     } catch(err) {
-        alert("Failed to update status: " + err.message);
+        alert("ไม่สามารถเปลี่ยนสถานะออเดอร์ได้: " + err.message);
     }
 }
 
 async function cancelOrder(orderId) {
-    if (confirm("Are you sure you want to cancel this order?")) {
+    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้?")) {
         await updateOrderStatus(orderId, 'cancelled');
     }
 }
@@ -344,12 +358,12 @@ async function refreshAdminMenuTable() {
                         <img src="${item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80'}" class="admin-item-img" alt="${item.name}">
                         <div>
                             <div class="admin-item-name">${item.name}</div>
-                            <div class="admin-item-category">${item.category}</div>
+                            <div class="admin-item-category">${CATEGORY_TRANSLATIONS[item.category] || item.category}</div>
                         </div>
                     </div>
                 </td>
                 <td><strong>฿${parseFloat(item.price).toFixed(2)}</strong></td>
-                <td style="text-transform: capitalize;">${item.category}</td>
+                <td>${CATEGORY_TRANSLATIONS[item.category] || item.category}</td>
                 <td>
                     <label class="switch">
                         <input type="checkbox" ${item.available ? "checked" : ""} onchange="toggleItemAvailability('${item.id}', this.checked)">
@@ -358,8 +372,8 @@ async function refreshAdminMenuTable() {
                 </td>
                 <td>
                     <div class="action-buttons">
-                        <button class="btn-edit" onclick="openMenuModal('${item.id}')">✏️ Edit</button>
-                        <button class="btn-delete" onclick="deleteMenuItem('${item.id}')">🗑️ Delete</button>
+                        <button class="btn-edit" onclick="openMenuModal('${item.id}')">✏️ แก้ไข</button>
+                        <button class="btn-delete" onclick="deleteMenuItem('${item.id}')">🗑️ ลบ</button>
                     </div>
                 </td>
             `;
@@ -374,7 +388,7 @@ async function toggleItemAvailability(id, checked) {
     try {
         await db.updateMenuItem(id, { available: checked });
     } catch(err) {
-        alert("Failed to toggle availability: " + err.message);
+        alert("ไม่สามารถปรับสถานะได้: " + err.message);
         refreshAdminMenuTable();
     }
 }
@@ -391,8 +405,8 @@ function openMenuModal(itemId = null) {
     
     if (itemId) {
         // Edit mode
-        titleEl.innerText = "Edit Menu Item";
-        btnEl.innerText = "Save Changes";
+        titleEl.innerText = "แก้ไขข้อมูลเมนูอาหาร";
+        btnEl.innerText = "บันทึกการแก้ไข";
         
         const item = adminMenuItems.find(m => m.id === itemId);
         if (item) {
@@ -405,8 +419,8 @@ function openMenuModal(itemId = null) {
         }
     } else {
         // Create mode
-        titleEl.innerText = "Add Menu Item";
-        btnEl.innerText = "Add Dish";
+        titleEl.innerText = "เพิ่มรายการเมนูใหม่";
+        btnEl.innerText = "เพิ่มรายการอาหาร";
     }
     
     if (modal) modal.classList.add("active");
@@ -431,26 +445,26 @@ async function saveMenuItem(e) {
     try {
         if (id) {
             await db.updateMenuItem(id, itemData);
-            alert("Dish updated successfully!");
+            alert("บันทึกการแก้ไขข้อมูลเมนูสำเร็จ!");
         } else {
             await db.addMenuItem(itemData);
-            alert("Dish added successfully!");
+            alert("เพิ่มรายการอาหารใหม่เรียบร้อย!");
         }
         closeMenuModal();
         refreshAdminMenuTable();
     } catch(err) {
-        alert("Failed to save item: " + err.message);
+        alert("ไม่สามารถบันทึกข้อมูลได้: " + err.message);
     }
 }
 
 async function deleteMenuItem(id) {
-    if (confirm("Are you sure you want to delete this menu item?")) {
+    if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบเมนูอาหารนี้ออกจากระบบ?")) {
         try {
             await db.deleteMenuItem(id);
-            alert("Item deleted successfully!");
+            alert("ลบข้อมูลเมนูอาหารเรียบร้อย!");
             refreshAdminMenuTable();
         } catch(err) {
-            alert("Failed to delete item: " + err.message);
+            alert("ไม่สามารถลบข้อมูลได้: " + err.message);
         }
     }
 }
@@ -469,10 +483,10 @@ function loadDbConfigUI() {
     
     if (db.isSupabase) {
         statusBar.className = "db-status-bar active";
-        statusText.innerText = "Connected: Supabase Database Active.";
+        statusText.innerText = "เชื่อมต่อสำเร็จ: ระบบรันอยู่บนฐานข้อมูล Supabase PostgreSQL (คลาวด์)";
     } else {
         statusBar.className = "db-status-bar inactive";
-        statusText.innerText = "Disconnected: Running in LocalStorage Fallback.";
+        statusText.innerText = "ปิดการเชื่อมต่อ: ขณะนี้ระบบรันบนฐานข้อมูลสำรอง LocalStorage ในเครื่อง";
     }
 }
 
@@ -483,17 +497,17 @@ function saveDbConfig(e) {
     
     const success = db.setSupabaseCredentials(url, key);
     if (success) {
-        alert("Successfully connected to Supabase PostgreSQL database!");
+        alert("เชื่อมต่อกับฐานข้อมูล Supabase เรียบร้อยแล้ว!");
     } else {
-        alert("Configuration saved, but could not connect to Supabase. Check credentials and load state.");
+        alert("บันทึกข้อมูลสำเร็จ แต่ไม่สามารถเชื่อมต่อ Supabase ได้ กรุณาตรวจสอบข้อมูลและความถูกต้องของ URL/Key");
     }
     loadDbConfigUI();
 }
 
 function disconnectDb() {
-    if (confirm("Disconnect from Supabase and clear custom credentials? This resets the DB to local storage.")) {
+    if (confirm("คุณต้องการตัดการเชื่อมต่อกับ Supabase และกลับมาใช้ LocalStorage ในบราวเซอร์หลักใช่หรือไม่?")) {
         db.setSupabaseCredentials("", "");
-        alert("Credentials cleared. Connected to LocalStorage database.");
+        alert("ระบบกลับมารันบน LocalStorage ฐานข้อมูลส่วนตัวเรียบร้อย");
         loadDbConfigUI();
     }
 }
@@ -530,16 +544,16 @@ async function saveRestSettings(e) {
             taxRate: tax,
             receiptFooter: footer
         });
-        alert("Restaurant settings saved!");
+        alert("บันทึกการตั้งค่าร้านค้าสำเร็จ!");
         loadRestSettingsUI();
         updateCartRates();
     } catch(err) {
-        alert("Failed to save settings: " + err.message);
+        alert("ไม่สามารถบันทึกข้อมูลได้: " + err.message);
     }
 }
 
 // ==========================================
-// 5. RECEIPT PRINT SERVICE (POS 80mm Layout)
+// 5. RECEIPT PRINT SERVICE (POS 80mm Layout) - THAI EDITION
 // ==========================================
 
 async function printReceipt(order) {
@@ -547,8 +561,8 @@ async function printReceipt(order) {
     const receiptContainer = document.getElementById("print-receipt-container");
     if (!receiptContainer) return;
     
-    const formattedDate = new Date(order.created_at).toLocaleDateString();
-    const formattedTime = new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const formattedDate = new Date(order.created_at).toLocaleDateString('th-TH');
+    const formattedTime = new Date(order.created_at).toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
     
     let itemsMarkup = "";
     order.items.forEach(item => {
@@ -564,17 +578,17 @@ async function printReceipt(order) {
     receiptContainer.innerHTML = `
         <div class="receipt-header">
             <div class="receipt-title">${settings.restaurantName}</div>
-            <div style="font-size: 12px;">${settings.address}</div>
-            <div style="font-size: 12px;">Tel: ${settings.phone}</div>
+            <div style="font-size: 12px; line-height: 1.3;">${settings.address}</div>
+            <div style="font-size: 12px;">โทร: ${settings.phone}</div>
             <div class="receipt-divider"></div>
-            <div class="receipt-title" style="font-size: 15px;">SALES RECEIPT</div>
+            <div class="receipt-title" style="font-size: 15px;">ใบเสร็จรับเงิน (RECEIPT)</div>
         </div>
         
         <div class="receipt-meta">
-            <strong>Order:</strong> ${order.order_number}<br>
-            <strong>Date:</strong> ${formattedDate} ${formattedTime}<br>
-            <strong>Customer:</strong> ${order.customer_name}<br>
-            <strong>Table:</strong> ${order.table_number}
+            <strong>เลขที่ออเดอร์:</strong> ${order.order_number}<br>
+            <strong>วันที่:</strong> ${formattedDate} ${formattedTime}<br>
+            <strong>ลูกค้า:</strong> ${order.customer_name}<br>
+            <strong>จุดบริการ/โต๊ะ:</strong> ${order.table_number}
         </div>
         
         <div class="receipt-divider"></div>
@@ -582,8 +596,8 @@ async function printReceipt(order) {
         <table class="receipt-table">
             <thead>
                 <tr>
-                    <th>ITEMS</th>
-                    <th class="num">AMOUNT</th>
+                    <th>รายการอาหาร</th>
+                    <th class="num">จำนวนเงิน</th>
                 </tr>
             </thead>
             <tbody>
@@ -595,19 +609,19 @@ async function printReceipt(order) {
         
         <div class="receipt-summary">
             <div class="receipt-summary-row">
-                <span>Subtotal:</span>
+                <span>ยอดรวมหลัก:</span>
                 <span>฿${parseFloat(order.subtotal).toFixed(2)}</span>
             </div>
             <div class="receipt-summary-row">
-                <span>Service Charge (${settings.serviceChargeRate}%):</span>
+                <span>ค่าบริการ (Service Charge ${settings.serviceChargeRate}%):</span>
                 <span>฿${parseFloat(order.service_charge).toFixed(2)}</span>
             </div>
             <div class="receipt-summary-row">
-                <span>VAT (${settings.taxRate}%):</span>
+                <span>ภาษีมูลค่าเพิ่ม (VAT ${settings.taxRate}%):</span>
                 <span>฿${parseFloat(order.tax).toFixed(2)}</span>
             </div>
             <div class="receipt-summary-row total">
-                <span>TOTAL AMOUNT:</span>
+                <span>ยอดเงินสุทธิ:</span>
                 <span>฿${parseFloat(order.total).toFixed(2)}</span>
             </div>
         </div>
@@ -616,7 +630,7 @@ async function printReceipt(order) {
         
         <div class="receipt-footer">
             ${settings.receiptFooter}<br>
-            Powered by The Tasty Plate Cloud
+            ระบบประมวลผลอัจฉริยะเดอะ เทสตี้ เพลท คลาวด์
         </div>
         
         <div class="receipt-barcode">

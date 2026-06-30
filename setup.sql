@@ -1,5 +1,5 @@
 -- ==========================================
--- RESTAURANT APP DATABASE SETUP FOR SUPABASE
+-- RESTAURANT APP DATABASE SETUP FOR SUPABASE - THAI EDITION
 -- Copy and paste this script into your Supabase SQL Editor
 -- ==========================================
 
@@ -49,18 +49,18 @@ ALTER TABLE staff_users DISABLE ROW LEVEL SECURITY;
 
 -- Seed default staff user (username: admin, password: password123)
 INSERT INTO staff_users (username, password, name, role)
-VALUES ('admin', 'password123', 'Manager Admin', 'admin')
+VALUES ('admin', 'password123', 'ผู้จัดการ แอดมิน', 'admin')
 ON CONFLICT (username) DO NOTHING;
 
--- Seed default menu items
+-- Seed default menu items (Thai Edition)
 INSERT INTO menu_items (name, price, description, category, image_url, available)
 VALUES 
-('Spaghetti Carbonara', 189.00, 'Classic Italian pasta with creamy egg sauce, parmesan cheese, and crispy bacon.', 'main', 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=600&auto=format&fit=crop&q=80', true),
-('Wagyu Beef Burger', 259.00, 'Premium Wagyu beef patty, cheddar cheese, caramelized onions, and signature burger sauce on brioche bun.', 'main', 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80', true),
-('Caesar Salad with Grilled Chicken', 159.00, 'Fresh romaine lettuce tossed with Caesar dressing, croutons, parmesan cheese, and tender grilled chicken.', 'appetizer', 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=600&auto=format&fit=crop&q=80', true),
-('Truffle French Fries', 129.00, 'Golden crispy french fries tossed with white truffle oil, sea salt, and grated parmesan cheese.', 'appetizer', 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80', true),
-('New York Cheesecake', 119.00, 'Rich and creamy classic baked cheesecake with a sweet graham cracker crust and raspberry coulis.', 'dessert', 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=600&auto=format&fit=crop&q=80', true),
-('Chocolate Lava Cake', 139.00, 'Warm chocolate cake with a molten chocolate center, served with vanilla bean ice cream.', 'dessert', 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&auto=format&fit=crop&q=80', true),
-('Iced Matcha Latte', 85.00, 'Premium Japanese Uji matcha whisked with fresh milk and sweetened with organic honey.', 'drink', 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=600&auto=format&fit=crop&q=80', true),
-('Fresh Thai Coconut Water', 75.00, 'Chilled young organic coconut served whole, naturally sweet and refreshing.', 'drink', 'https://images.unsplash.com/photo-1525385133336-254847240f92?w=600&auto=format&fit=crop&q=80', true)
+('สปาเก็ตตี้คาโบนาร่า', 189.00, 'เส้นสปาเก็ตตี้เหนียวนุ่ม ผัดซอสครีมข้มข้นสูตรอิตาเลียนแท้ โรยพาเมซานชีสและเบคอนกรอบหอมกรุ่น', 'main', 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=600&auto=format&fit=crop&q=80', true),
+('เบอร์เกอร์เนื้อวากิวพรีเมียม', 259.00, 'เนื้อวากิวบดชิ้นโตย่างชุ่มฉ่ำ ประกบเชดดาร์ชีสเยิ้ม หอมใหญ่ผัดหวาน และซอสโฮมเมดสูตรพิเศษบนขนมปังบริออช', 'main', 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&auto=format&fit=crop&q=80', true),
+('ซีซาร์สลัดอกไก่ย่าง', 159.00, 'ผักสลัดคอสกรอบสด คลุกเคล้าน้ำสลัดซีซาร์สูตรดั้งเดิม โรยเบคอนกรอบ ขนมปังกรอบ และอกไก่ย่างเนื้อนุ่ม', 'appetizer', 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=600&auto=format&fit=crop&q=80', true),
+('เฟรนช์ฟรายส์ซอสทรัฟเฟิล', 129.00, 'มันฝรั่งทอดชิ้นหนาสีเหลืองทองกรอบนอกนุ่มใน คลุกเคล้าน้ำมันเห็ดทรัฟเฟิลและพาร์เมซานชีสขูดสด', 'appetizer', 'https://images.unsplash.com/photo-1573080496219-bb080dd4f8777?w=600&auto=format&fit=crop&q=80', true),
+('นิวยอร์กชีสเค้กคลาสสิก', 119.00, 'ชีสเค้กเนื้อครีมเนียนนุ่ม หอมมัน เข้มข้น บนฐานบิสกิตอบเนยกรุบกรอบ เสิร์ฟพร้อมซอสสตรอว์เบอร์รี่รสเปรี้ยวหวาน', 'dessert', 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=600&auto=format&fit=crop&q=80', true),
+('ช็อกโกแลตลาวาเค้ก', 139.00, 'เค้กช็อกโกแลตอุ่นร้อน สอดไส้ซอสช็อกโกแลตเบลเยียมเข้มข้นเยิ้มๆ เสิร์ฟพร้อมไอศกรีมวานิลลาเม็ดแท้', 'dessert', 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&auto=format&fit=crop&q=80', true),
+('มัทฉะลาเต้เย็นสูตรพิเศษ', 85.00, 'ผงมัทฉะแท้เกรดพิธีการนำเข้าจากญี่ปุ่น ชงเข้มข้นผสมนมสดแท้ เพิ่มความหวานละมุนด้วยน้ำผึ้งป่าแท้', 'drink', 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=600&auto=format&fit=crop&q=80', true),
+('น้ำมะพร้าวน้ำหอมสดแท้', 75.00, 'น้ำมะพร้าวออร์แกนิกคัดเกรดเสิร์ฟแช่เย็นเจาะสดๆ รสชาติหวานหอมกลมกล่อมจากธรรมชาติ ดับร้อนได้ดีเยี่ยม', 'drink', 'https://images.unsplash.com/photo-1525385133336-254847240f92?w=600&auto=format&fit=crop&q=80', true)
 ON CONFLICT DO NOTHING;
