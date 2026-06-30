@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Tasty Plate - Premium Online Dining & Backoffice</title>
+    <!-- CSS File -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Supabase Client Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Chart.js CDN for Admin Reports -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- ==========================================
+         CUSTOMER PORTAL VIEW
+         ========================================== -->
+    <div id="customer-view" class="view-section active">
+        <nav class="restaurant-nav">
+            <a href="#" class="nav-logo">
+                <svg viewBox="0 0 24 24" width="28" height="28">
+                    <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-10.03C11.34 11.84 13 10.12 13 9V2h-2v7zm8-3h-3v7h3v9h2V3c0-1.66-1.34-3-3-3v6z"/>
+                </svg>
+                The Tasty Plate
+            </a>
+            <div class="nav-actions">
+                <button class="btn-staff-portal" onclick="navigateTo('login-view')">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Staff Portal
+                </button>
+                <button class="btn-cart-mobile-toggle" onclick="toggleCartMobile()">
+                    🛒 <span id="cart-badge-mobile">0</span>
+                </button>
+            </div>
+        </nav>
+
+        <main class="customer-container">
+            <!-- Left Side: Menu Selection -->
+            <section class="menu-section">
+                <!-- Hero Banner -->
+                <div class="hero-banner">
+                    <h1>Experience Gourmet Dining</h1>
+                    <p>Order freshly prepared culinary delights straight to your table or for takeaway. Fresh ingredients, masterful recipes.</p>
+                </div>
+
+                <!-- Categories -->
+                <div class="categories-container" id="categories-list">
+                    <button class="category-tab active" data-category="all">All Items</button>
+                    <button class="category-tab" data-category="appetizer">Appetizers</button>
+                    <button class="category-tab" data-category="main">Mains</button>
+                    <button class="category-tab" data-category="dessert">Desserts</button>
+                    <button class="category-tab" data-category="drink">Drinks</button>
+                </div>
+
+                <!-- Food Grid -->
+                <div class="menu-grid" id="food-grid">
+                    <!-- Dynamic rendering from script -->
+                </div>
+            </section>
+
+            <!-- Right Side: Interactive Cart Sidebar -->
+            <aside class="cart-sidebar" id="cart-sidebar">
+                <div class="cart-header">
+                    <h2>Your Order</h2>
+                    <span class="cart-count" id="cart-count">0 items</span>
+                </div>
+
+                <div class="cart-items-container" id="cart-items-list">
+                    <!-- Default state empty -->
+                    <div class="cart-empty">
+                        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                        <p>Your cart is empty.<br>Add some delicious dishes!</p>
+                    </div>
+                </div>
+
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="cart-subtotal">฿0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Service Charge (<span id="summary-sc-rate">10</span>%)</span>
+                        <span id="cart-service-charge">฿0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>VAT (<span id="summary-tax-rate">7</span>%)</span>
+                        <span id="cart-tax">฿0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="cart-total">฿0.00</span>
+                    </div>
+                    <button class="btn-checkout" onclick="openCheckoutModal()">Place Order</button>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+
+    <!-- ==========================================
+         STAFF LOGIN VIEW
+         ========================================== -->
+    <div id="login-view" class="view-section">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">The Tasty Plate</div>
+                <div class="login-subtitle">Staff Backoffice Portal</div>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+                </div>
+                <div class="error-msg" id="login-error" style="color: var(--danger); font-size: 14px; margin-bottom: 16px; display: none;">
+                    Invalid username or password.
+                </div>
+                <button type="submit" class="form-submit-btn">Login</button>
+                <button type="button" class="btn-action secondary" style="width: 100%; margin-top: 12px; padding: 12px;" onclick="navigateTo('customer-view')">Back to Menu</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         BACKOFFICE ADMIN VIEW
+         ========================================== -->
+    <div id="admin-view" class="view-section">
+        <div class="admin-layout">
+            <!-- Admin Sidebar -->
+            <aside class="admin-sidebar">
+                <div>
+                    <span class="sidebar-logo">Backoffice</span>
+                    <nav class="sidebar-nav">
+                        <button class="nav-item active" onclick="switchAdminPanel('dashboard')">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+                            Dashboard
+                        </button>
+                        <button class="nav-item" onclick="switchAdminPanel('orders')">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            Live Orders
+                        </button>
+                        <button class="nav-item" onclick="switchAdminPanel('menu')">
+                            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            Manage Menu
+                        </button>
+                        <button class="nav-item" onclick="switchAdminPanel('settings')">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            Settings
+                        </button>
+                    </nav>
+                </div>
+                <div class="sidebar-footer">
+                    <div class="staff-info">
+                        <p class="staff-name" id="staff-name">Staff Member</p>
+                        <p class="staff-role" id="staff-role">Staff</p>
+                    </div>
+                    <button class="btn-logout" onclick="handleLogout()">
+                        🚪 Logout
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Admin Content Panel -->
+            <main class="admin-content">
+                
+                <!-- 1. DASHBOARD PANEL -->
+                <div id="panel-dashboard" class="admin-panel active">
+                    <div class="admin-header">
+                        <h1>Overview</h1>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Today's Revenue</div>
+                            <div class="metric-value" id="metric-revenue">฿0.00</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Completed Orders</div>
+                            <div class="metric-value" id="metric-completed-count">0</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Active Orders</div>
+                            <div class="metric-value" id="metric-active-count">0</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Popular Category</div>
+                            <div class="metric-value" id="metric-popular-category">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-insights">
+                        <div class="insight-box">
+                            <h3 class="insight-title">Sales Trend</h3>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="insight-box">
+                            <h3 class="insight-title">Category Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. ORDERS PANEL -->
+                <div id="panel-orders" class="admin-panel">
+                    <div class="admin-header">
+                        <h1>Live Orders Queue</h1>
+                    </div>
+                    <div class="order-queue-grid" id="order-queue-container">
+                        <!-- Dynamic active order cards will load here -->
+                    </div>
+                </div>
+
+                <!-- 3. MENU MANAGEMENT PANEL -->
+                <div id="panel-menu" class="admin-panel">
+                    <div class="admin-header">
+                        <h1>Menu Management</h1>
+                        <button class="btn-add-item" onclick="openMenuModal()">+ Add Menu Item</button>
+                    </div>
+                    <table class="admin-menu-table">
+                        <thead>
+                            <tr>
+                                <th>Item Details</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-menu-list">
+                            <!-- Dynamic menu lists will load here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 4. SETTINGS PANEL -->
+                <div id="panel-settings" class="admin-panel">
+                    <div class="admin-header">
+                        <h1>General Settings</h1>
+                    </div>
+                    <div class="settings-layout">
+                        <!-- Left settings -->
+                        <div>
+                            <div class="settings-card">
+                                <h3 class="settings-card-title">Database Settings</h3>
+                                
+                                <!-- Connection Status -->
+                                <div id="db-status" class="db-status-bar inactive">
+                                    <span class="db-status-dot"></span>
+                                    <span id="db-status-text">Disconnected from Supabase. Running in LocalStorage fallback mode.</span>
+                                </div>
+
+                                <form id="supabase-config-form" onsubmit="saveDbConfig(event)">
+                                    <div class="form-group">
+                                        <label for="settings-db-url">Supabase Project URL</label>
+                                        <input type="url" id="settings-db-url" class="form-control" placeholder="https://yourproject.supabase.co" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="settings-db-key">Supabase Anon Key</label>
+                                        <input type="password" id="settings-db-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required>
+                                    </div>
+                                    <div style="display: flex; gap: 12px;">
+                                        <button type="submit" class="btn-action primary" style="padding: 10px 20px;">Connect to Supabase</button>
+                                        <button type="button" class="btn-action secondary" onclick="disconnectDb()">Disconnect & Reset</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="settings-card">
+                                <h3 class="settings-card-title">Restaurant Info</h3>
+                                <form id="settings-rest-form" onsubmit="saveRestSettings(event)">
+                                    <div class="form-group">
+                                        <label for="settings-rest-name">Restaurant Name</label>
+                                        <input type="text" id="settings-rest-name" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="settings-rest-address">Address</label>
+                                        <textarea id="settings-rest-address" class="form-control" rows="3" required></textarea>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="settings-rest-phone">Phone Number</label>
+                                            <input type="text" id="settings-rest-phone" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="settings-rest-sc">Service Charge (%)</label>
+                                            <input type="number" id="settings-rest-sc" class="form-control" step="0.1" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="settings-rest-tax">Tax / VAT Rate (%)</label>
+                                            <input type="number" id="settings-rest-tax" class="form-control" step="0.1" min="0" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="settings-rest-footer">Receipt Footer Message</label>
+                                            <input type="text" id="settings-rest-footer" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn-action primary" style="padding: 10px 20px;">Save General Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         MODALS (CHECKOUT & CRUD)
+         ========================================== -->
+    
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="modal-backdrop">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeCheckoutModal()">✕</button>
+            <h3 class="modal-title">Complete Your Order</h3>
+            <form id="checkout-form" onsubmit="submitOrder(event)">
+                <div class="form-group">
+                    <label for="customer-name">Customer Name</label>
+                    <input type="text" id="customer-name" class="form-control" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="table-number">Table / Takeaway Option</label>
+                    <select id="table-number" class="form-control" required>
+                        <option value="">Select option</option>
+                        <option value="Takeaway">Takeaway (หิ้วกลับบ้าน)</option>
+                        <option value="Table 1">Table 1</option>
+                        <option value="Table 2">Table 2</option>
+                        <option value="Table 3">Table 3</option>
+                        <option value="Table 4">Table 4</option>
+                        <option value="Table 5">Table 5</option>
+                        <option value="Table 6">Table 6</option>
+                    </select>
+                </div>
+                <button type="submit" class="form-submit-btn">Send Order to Kitchen</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Menu Item Modal (Create/Edit) -->
+    <div id="menu-modal" class="modal-backdrop">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeMenuModal()">✕</button>
+            <h3 class="modal-title" id="menu-modal-title">Add Menu Item</h3>
+            <form id="menu-form" onsubmit="saveMenuItem(event)">
+                <input type="hidden" id="menu-item-id">
+                <div class="form-group">
+                    <label for="menu-item-name">Dish Name</label>
+                    <input type="text" id="menu-item-name" class="form-control" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="menu-item-price">Price (฿)</label>
+                        <input type="number" id="menu-item-price" class="form-control" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="menu-item-category">Category</label>
+                        <select id="menu-item-category" class="form-control" required>
+                            <option value="appetizer">Appetizer</option>
+                            <option value="main">Main Course</option>
+                            <option value="dessert">Dessert</option>
+                            <option value="drink">Drink</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="menu-item-desc">Description</label>
+                    <textarea id="menu-item-desc" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="menu-item-img">Image URL</label>
+                    <input type="url" id="menu-item-img" class="form-control" placeholder="https://images.unsplash.com/...">
+                </div>
+                <button type="submit" class="form-submit-btn" id="menu-form-btn">Add Dish</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         POS THERMAL PRINT RECEIPT CONTAINER (HIDDEN)
+         ========================================== -->
+    <div id="print-receipt-container">
+        <!-- Generates automatically via print function -->
+    </div>
+
+
+    <!-- ==========================================
+         SCRIPTS INCLUSION
+         ========================================== -->
+    <!-- Supabase dynamic configuration -->
+    <script src="js/config.js"></script>
+    <!-- DB Handler (Must load before apps) -->
+    <script src="js/db.js"></script>
+    <!-- Customer Facing logic -->
+    <script src="js/app.js"></script>
+    <!-- Admin Portal logic -->
+    <script src="js/admin.js"></script>
+    
+</body>
+</html>
